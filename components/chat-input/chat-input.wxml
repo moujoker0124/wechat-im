@@ -15,8 +15,6 @@
             <image wx:else class="extra-btn-style"
                    src="../../image/chat/extra.png" catchtap="_chatInput$extra$click$event" />
         </view>
-
-
     </view>
     <block wx:if="{{extraObj.chatInputShowExtra}}">
         <view class="list-divide-line" />

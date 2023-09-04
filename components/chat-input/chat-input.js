@@ -46,7 +46,7 @@ Component({
         timer: -1,
         singleVoiceTimeCount: 0,
         textMessage: '',
-        voiceObj: {moveToCancel: false},
+        voiceObj: { moveToCancel: false },
         extraObj: {
             chatInputShowExtra: false,
             chatInputExtraArr: []
@@ -67,7 +67,7 @@ Component({
     },
     methods: {
         getRecordStatus() {
-            return {...status};
+            return { ...status };
         },
         closeExtraView() {
             this.setData({
@@ -79,7 +79,7 @@ Component({
             this.setData({
                 'extraObj.chatInputShowExtra': isShow
             }, () => {
-                this.triggerEvent(EVENT.EXTRA_CLICK, {isShow}, {});
+                this.triggerEvent(EVENT.EXTRA_CLICK, { isShow }, {});
             });
         },
         _change$input$way$event() {
@@ -88,13 +88,13 @@ Component({
                 'extraObj.chatInputShowExtra': false
             });
         },
-        _triggerVoiceRecordEvent({status, dataset}) {
-            this.triggerEvent(EVENT.VOICE_RECORD, {recordStatus: status, ...dataset}, {});
+        _triggerVoiceRecordEvent({ status, dataset }) {
+            this.triggerEvent(EVENT.VOICE_RECORD, { recordStatus: status, ...dataset }, {});
         },
         _long$click$voice$btn(e) {
             if ('send$voice$btn' === e.currentTarget.id) {//长按时需要打开录音功能，开始录音
                 this._checkRecordAuth(() => {
-                    const {maxVoiceTime, singleVoiceTimeCount} = this.data;
+                    const { maxVoiceTime, singleVoiceTimeCount } = this.data;
                     this.setData({//调出取消弹窗
                         'voiceObj.showCancelSendVoicePart': true,
                         'voiceObj.timeDownNum': maxVoiceTime - singleVoiceTimeCount,
@@ -102,9 +102,9 @@ Component({
                         'voiceObj.startStatus': 1,
                         'voiceObj.moveToCancel': false
                     }, () => {
-                        this._triggerVoiceRecordEvent({status: status.START});
+                        this._triggerVoiceRecordEvent({ status: status.START });
                     });
-                    this.recorderManager.start({duration: 60000, format: this.data.format});
+                    this.recorderManager.start({ duration: 60000, format: this.data.format });
                 }, (res) => {
                     //录音失败
                     console.error('录音拒绝授权');
@@ -114,7 +114,7 @@ Component({
                         'voiceObj.status': 'end',
                         'voiceObj.showCancelSendVoicePart': false
                     });
-                    this._triggerVoiceRecordEvent({status: status.UNAUTH});
+                    this._triggerVoiceRecordEvent({ status: status.UNAUTH });
 
                     wx.showModal({
                         title: '您未授权语音功能',
@@ -145,7 +145,7 @@ Component({
         _dealVoiceLongClickEventWithHighVersion() {
             this.recorderManager.onStart(() => {
                 this.data.singleVoiceTimeCount = 0;
-                const {_startTimeDown, maxVoiceTime} = this.data;
+                const { _startTimeDown, maxVoiceTime } = this.data;
                 //设置定时器计时60秒
                 this.data.timer = setInterval(() => {
                     const voiceTimeCount = ++this.data.singleVoiceTimeCount;
@@ -167,7 +167,7 @@ Component({
         },
         _send$voice$move$event(e) {
             if ('send$voice$btn' === e.currentTarget.id) {
-                const {windowHeight, voiceObj, tabBarHeight, cancelLineYPosition} = this.data,
+                const { windowHeight, voiceObj, tabBarHeight, cancelLineYPosition } = this.data,
                     y = windowHeight + tabBarHeight - e.touches[0].clientY;
                 if (y > cancelLineYPosition) {
                     if (!voiceObj.moveToCancel) {
@@ -187,7 +187,7 @@ Component({
         },
         _send$voice$move$end$event(e) {
             if ('send$voice$btn' === e.currentTarget.id) {
-                const {singleVoiceTimeCount, minVoiceTime, timer} = this.data;
+                const { singleVoiceTimeCount, minVoiceTime, timer } = this.data;
                 if (singleVoiceTimeCount < minVoiceTime) {//语音时间太短
                     this.setData({
                         'voiceObj.status': 'short'
@@ -204,7 +204,7 @@ Component({
             }
         },
         _initVoiceData() {
-            const {windowWidth, windowHeight} = this.data, width = windowWidth / 2.6;
+            const { windowWidth, windowHeight } = this.data, width = windowWidth / 2.6;
             this.setData({
                 'inputStatus': 'text',
                 'windowHeight': windowHeight,
@@ -244,7 +244,7 @@ Component({
             this.setData({
                 textMessage: ''
             }, () => {
-                this.triggerEvent(EVENT.SEND_MESSAGE, {value: e.detail.value});
+                this.triggerEvent(EVENT.SEND_MESSAGE, { value: e.detail.value });
                 this.data.inputValueEventTemp = '';
             });
         },
@@ -265,38 +265,38 @@ Component({
                 'inputType': 'none'
             }, () => {
                 if (!!this.data.inputValueEventTemp) {
-                    this.triggerEvent(EVENT.SEND_MESSAGE, {value: this.data.inputValueEventTemp});
+                    this.triggerEvent(EVENT.SEND_MESSAGE, { value: this.data.inputValueEventTemp });
                     this.data.inputValueEventTemp = '';
                 }
             });
         },
         _chatInput$getValue$event(e) {
-            const {detail: {value: textMessage}} = e;
+            const { detail: { value: textMessage } } = e;
             this.data.inputValueEventTemp = textMessage;
             this.setData({
                 textMessage
             })
         },
         _chatInput$extra$item$click$event(e) {
-            const {currentTarget: {dataset}} = e;
-            this.triggerEvent(EVENT.EXTRA_ITEM_CLICK, {...dataset}, {});
+            const { currentTarget: { dataset } } = e;
+            this.triggerEvent(EVENT.EXTRA_ITEM_CLICK, { ...dataset }, {});
         },
 
         _setVoiceListener() {
             this.recorderManager.onStop((res) => {
                 console.log(res, this.data.voiceObj.status);
                 if (this.data.voiceObj.status === 'short') {//录音时间太短或者移动到了取消录音区域， 则取消录音
-                    this._triggerVoiceRecordEvent({status: status.SHORT});
+                    this._triggerVoiceRecordEvent({ status: status.SHORT });
                     return;
                 } else if (this.data.voiceObj.moveToCancel) {
-                    this._triggerVoiceRecordEvent({status: status.CANCEL});
+                    this._triggerVoiceRecordEvent({ status: status.CANCEL });
                     return;
                 }
                 console.log('录音成功');
-                this._triggerVoiceRecordEvent({status: status.SUCCESS, dataset: res});
+                this._triggerVoiceRecordEvent({ status: status.SUCCESS, dataset: res });
             });
             this.recorderManager.onError((res) => {
-                this._triggerVoiceRecordEvent({status: status.FAIL, dataset: res});
+                this._triggerVoiceRecordEvent({ status: status.FAIL, dataset: res });
             });
         },
 
@@ -324,7 +324,7 @@ Component({
     lifetimes: {
         created() {
             this.recorderManager = wx.getRecorderManager();
-            const {windowHeight, windowWidth} = wx.getSystemInfoSync();
+            const { windowHeight, windowWidth } = wx.getSystemInfoSync();
             if (!windowHeight || !windowWidth) {
                 console.error('没有获取到手机的屏幕尺寸：windowWidth', windowWidth, 'windowHeight', windowHeight);
                 return;
